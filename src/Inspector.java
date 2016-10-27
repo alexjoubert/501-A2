@@ -18,26 +18,26 @@ public class Inspector {
 
 		System.out.print("Interfaces: ");
 		printInterfaceNames(obj);
-		
+
 		System.out.println("Methods:");
 		printMethods(obj);
 	}
 
 	private static void printDeclaringClass(Object obj) {
-		Class<?> c = obj.getClass();
+		Class c = obj.getClass();
 		System.out.println(c.getName());
 	}
 
 	private static void printSuperClass(Object obj) {
 		try{
-			Class<?> sClass = obj.getClass().getSuperclass(); 
+			Class sClass = obj.getClass().getSuperclass(); 
 			System.out.println(sClass.getName());
 		}catch(Exception e){System.out.println(e);}
 	}
 
 	private static void printInterfaceNames(Object obj) {
 		try{
-			Class<?>[] interfaces = obj.getClass().getInterfaces(); 
+			Class[] interfaces = obj.getClass().getInterfaces(); 
 			for (int i = 0; i < interfaces.length; i++) {
 				String interfaceName = interfaces[i].getName();
 				if (i != interfaces.length - 1)
@@ -64,8 +64,7 @@ public class Inspector {
 	private static void printMethods(Object obj){
 		Method[] methArr = getMethods(obj);
 
-		for (int i=0; i<methArr.length; i++)
-		{
+		for (int i = 0; i < methArr.length; i++) {
 			Method methVal = methArr[i];
 
 			Class[] exVal = methArr[i].getExceptionTypes();
@@ -93,6 +92,68 @@ public class Inspector {
 			System.out.println("Exceptions: " + exVal);
 			System.out.println("Parameters: "  + params);
 			System.out.println("Return Type: " + returnVal.getName());
+			System.out.println("Modifiers: " + modVal + "\n");
+		}
+	}
+
+	private static Constructor[] getConstructors(Object obj){
+		List<Constructor> result = new ArrayList<Constructor>();
+
+		for (Class c = obj.getClass(); c != null; c = c.getSuperclass()) {
+			for (Constructor constructor : c.getDeclaredConstructors()) {
+				result.add(constructor);
+			}
+		}
+		return result.toArray(new Constructor[result.size()]); 
+	}
+
+	private static void printConstructors(Object obj){
+		Constructor[] conArr = getConstructors(obj);
+
+		for (int i = 0; i < conArr.length; i++) {
+			Constructor conVal = conArr[i];
+
+			Class[] paramVal = conVal.getParameterTypes();
+			StringBuffer params = new StringBuffer();
+			for (int j = 0; j < paramVal.length; j++) {
+				if (j > 0)
+					params.append(", ");
+				params.append(paramVal[j].getName());
+			}
+
+			int mods = conVal.getModifiers();
+			String modVal = Modifier.toString(mods);
+			
+			System.out.println("Constructor: " + conVal.getName() + "()");
+			System.out.println("Parameters: "  + params);
+			System.out.println("Modifiers: " + modVal + "\n");
+		}
+	}
+
+	private static Field[] getFields(Object obj){
+		List<Field> result = new ArrayList<Field>();
+
+		for (Class c = obj.getClass(); c != null; c = c.getSuperclass()) {
+			for (Field field : c.getDeclaredFields()) {
+				result.add(field);
+			}
+		}
+		return result.toArray(new Field[result.size()]); 
+	}
+	
+	private static void printFields(Object obj){
+		Field[] fieldArr = getFields(obj);
+
+		for (int i = 0; i < fieldArr.length; i++) {
+			Field fieldVal = fieldArr[i];
+			
+			Class typeVal = fieldVal.getType();
+
+			int mods = fieldVal.getModifiers();
+			String modVal = Modifier.toString(mods);
+			
+			System.out.println("Constructor: " + fieldVal.getName() + "()");
+			System.out.println("Type: "  + typeVal.getName());
 			System.out.println("Modifiers: " + modVal + "\n");
 		}
 	}
